@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="ru" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>AdmissionHack — LOGOS Hackathon 2026</title>
+<style>
+/* ============================================================
+   ADMISSIONHACK / LOGOS 2026
+   Fixed 16:9 stage (1920×1080), scaled to viewport.
+   Motion tiers: default / reduce (?reduce=1 or OS setting).
+   ============================================================ */
+
+:root{
+  --ink:#07080A;
+  --panel:#0C0E11;
+  --panel-2:#111418;
+  --text:#E9E7E2;
+  --dim:#8A9099;
+  --dimmer:#7A8089;
+  --line:rgba(233,231,226,.11);
+  --line-strong:rgba(233,231,226,.22);
+  --green:#7DF2A8;
+  --green-dim:rgba(125,242,168,.14);
+  --amber:#FFC24B;
+  --amber-dim:rgba(255,194,75,.12);
+  --red:#FF6F61;
+  --sans:"Inter","Helvetica Neue","Liberation Sans",Arial,sans-serif;
+  --mono:ui-monospace,"JetBrains Mono","IBM Plex Mono","DejaVu Sans Mono","Liberation Mono",monospace;
+  --pad-x:104px;
+  --pad-y:76px;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;height:100%;background:var(--ink);color:var(--text);}
+body{font-family:var(--sans);-webkit-font-smoothing:antialiased;overflow:hidden;}
+
+.viewport{position:fixed;inset:0;display:block;overflow:hidden;}
+
+.stage{
+  position:absolute;left:50%;top:50%;
+  width:1920px;height:1080px;
+  transform:translate(-50%,-50%) scale(var(--scale,1));
+  transform-origin:center center;
+  background:
+    radial-gradient(ellipse 1200px 700px at 78% -10%, rgba(125,242,168,.055), transparent 62%),
+    radial-gradient(ellipse 900px 600px at 8% 110%, rgba(255,194,75,.035), transparent 60%),
+    var(--ink);
+  overflow:hidden;
+}
+.stage::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(rgba(233,231,226,.10) 1px, transparent 1px);
+  background-size:34px 34px;
+  opacity:.28;
+  mask-image:radial-gradient(ellipse at 50% 50%, #000 25%, transparent 78%);
+}
+.stage::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  box-shadow:inset 0 0 220px 60px rgba(0,0,0,.55);
+}
+
+.slide{
+  color:var(--text);
+  position:absolute;inset:0;
+  padding:var(--pad-y) var(--pad-x);
+  display:grid;grid-template-rows:36px 1fr 34px;gap:26px;
+  opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity 180ms ease-out;
+}
+.slide.is-active{opacity:1;visibility:visible;pointer-events:auto;}
+
+/* ---------- chrome ---------- */
+.head{
+  display:flex;align-items:center;justify-content:space-between;
+  font-family:var(--mono);font-size:14px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--dimmer);
+  border-bottom:1px solid var(--line);padding-bottom:14px;
+}
+.head .brand{color:var(--text);letter-spacing:.2em;}
+.head .brand .dot{color:var(--green);}
+.head .sect{color:var(--green);}
+.foot{
+  display:flex;align-items:center;justify-content:space-between;
+  font-family:var(--mono);font-size:13px;letter-spacing:.12em;
+  color:var(--dimmer);border-top:1px solid var(--line);padding-top:12px;
+}
+.foot .coords{color:var(--dimmer);}
+.foot .pageno{color:var(--text);font-variant-numeric:tabular-nums;}
+.foot .pageno b{color:var(--green);font-weight:500;}
+
+.ghost{
+  position:absolute;right:-34px;top:142px;
+  font-family:var(--mono);font-size:330px;line-height:.76;
+  letter-spacing:-.07em;color:rgba(233,231,226,.03);
+  pointer-events:none;user-select:none;
+}
+
+.body{position:relative;min-height:0;display:flex;flex-direction:column;}
+
+/* ---------- type ---------- */
+.eyebrow{
+  font-family:var(--mono);font-size:15px;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--dim);margin:0 0 22px;
+}
+.eyebrow b{color:var(--green);font-weight:500;}
+h1{
+  font-size:150px;line-height:.9;letter-spacing:-.045em;font-weight:800;
+  margin:0;text-transform:uppercase;
+}
+h2{
+  font-size:88px;line-height:1.0;letter-spacing:-.035em;font-weight:800;
+  margin:0;max-width:1500px;
+}
+h2 .thin{font-weight:300;color:var(--dim);}
+h2 em{font-style:normal;color:var(--green);}
+.lead{font-size:33px;line-height:1.45;color:var(--text);max-width:1180px;margin:26px 0 0;}
+.body-txt{font-size:26px;line-height:1.55;color:var(--dim);max-width:1120px;}
+.mono{font-family:var(--mono);}
+.prompt{color:var(--green);font-family:var(--mono);}
+
+/* ---------- shared blocks ---------- */
+.rule{height:1px;background:var(--line);width:100%;}
+.tag{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:var(--mono);font-size:14px;letter-spacing:.14em;text-transform:uppercase;
+  padding:8px 13px;border:1px solid var(--line-strong);color:var(--text);
+}
+.tag.on{background:var(--green-dim);border-color:rgba(125,242,168,.4);color:var(--green);}
+.marker{display:inline-block;width:8px;height:8px;background:var(--green);}
+
+/* ---------- 01 title ---------- */
+.title-grid{display:grid;grid-template-rows:1fr auto;height:100%;}
+.title-main{display:flex;flex-direction:column;justify-content:center;padding-top:8px;}
+.title-sub{
+  font-family:var(--mono);font-size:30px;color:var(--dim);margin-top:30px;letter-spacing:-.01em;
+}
+.title-sub .cursor{
+  display:inline-block;width:15px;height:32px;background:var(--green);
+  vertical-align:-4px;margin-left:12px;
+  animation:blink 1.05s steps(1,end) 3;
+}
+.title-meta{
+  display:flex;gap:44px;flex-wrap:wrap;align-items:center;
+  border-top:1px solid var(--line);padding-top:26px;
+  font-family:var(--mono);font-size:16px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase;
+}
+.title-meta .k{color:var(--dimmer);}
+.title-meta .v{color:var(--text);}
+.title-meta .url{color:var(--green);text-transform:none;letter-spacing:0;}
+
+
+.title-index{position:absolute;right:0;top:146px;width:328px;}
+.ti-cap{font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--dimmer);padding-bottom:12px;border-bottom:1px solid var(--line);}
+.title-index ol{list-style:none;margin:0;padding:0;}
+.title-index li{display:flex;gap:16px;align-items:baseline;padding:9px 0;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:14px;letter-spacing:.02em;color:var(--dim);}
+.title-index li span{color:var(--dimmer);width:22px;flex:none;}
+
+/* ---------- 02 case ---------- */
+.case-wrap{display:grid;grid-template-columns:1.35fr .65fr;gap:80px;height:100%;align-items:center;}
+.case-quote{
+  font-size:64px;line-height:1.1;letter-spacing:-.03em;font-weight:700;margin:0 0 34px;max-width:1000px;
+}
+.case-quote span{color:var(--green);}
+.case-facts{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--line);}
+.case-fact{
+  display:flex;justify-content:space-between;align-items:baseline;gap:20px;
+  padding:20px 0;border-bottom:1px solid var(--line);
+  font-family:var(--mono);font-size:17px;
+}
+.case-fact .k{color:var(--dimmer);letter-spacing:.08em;text-transform:uppercase;font-size:14px;}
+.case-fact .v{color:var(--text);font-size:24px;}
+.case-fact .v.bad{color:var(--amber);}
+.case-foot{
+  position:absolute;left:0;right:0;bottom:0;display:flex;gap:18px;align-items:center;
+  font-family:var(--mono);font-size:19px;color:var(--green);
+}
+.case-foot .marker{flex:none;}
+
+/* ---------- 03 numbers ---------- */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid var(--line-strong);margin-top:48px;}
+.stat{padding:34px 28px 0 0;border-right:1px solid var(--line);}
+.stat:last-child{border-right:0;}
+.num,.mod-num,.loc-block .big,.metric .n,.subfacts b{word-spacing:-.40em;}
+.loc-block .big small{word-spacing:normal;}
+.mod-num .u{word-spacing:normal;}
+.stat .num{
+  font-family:var(--mono);font-size:96px;line-height:.92;letter-spacing:-.05em;
+  font-variant-numeric:tabular-nums;color:var(--text);
+}
+.stat:first-child .num{color:var(--green);}
+.stat .lbl{font-size:19px;line-height:1.35;color:var(--dim);margin-top:15px;max-width:270px;}
+.stat .src{font-family:var(--mono);font-size:12px;color:var(--dimmer);margin-top:12px;letter-spacing:.06em;}
+
+.subfacts{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);margin-top:26px;}
+.subfacts span{padding:16px 24px 0 0;border-right:1px solid var(--line);font-size:16px;line-height:1.35;color:var(--dim);}
+.subfacts span:last-child{border-right:0;}
+.subfacts b{display:block;font-family:var(--mono);font-size:26px;letter-spacing:-.02em;color:var(--text);margin-bottom:6px;font-weight:400;}
+
+.insight{
+  margin-top:auto;padding-top:26px;border-top:1px solid var(--line);
+  font-size:30px;line-height:1.35;color:var(--text);max-width:1400px;
+}
+.insight b{color:var(--green);font-weight:600;}
+
+/* ---------- 04 causes ---------- */
+.causes{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--line-strong);margin-top:46px;}
+.cause{padding:30px 34px 0 0;border-right:1px solid var(--line);}
+.cause:last-child{border-right:0;}
+.cause .idx{font-family:var(--mono);font-size:14px;color:var(--green);letter-spacing:.16em;}
+.cause h3{font-size:34px;margin:16px 0 14px;letter-spacing:-.02em;font-weight:700;line-height:1.12;}
+.cause p{font-size:21px;line-height:1.5;color:var(--dim);margin:0;}
+
+/* ---------- 05 sdg ---------- */
+.sdg-wrap{display:grid;grid-template-columns:1fr 1fr;gap:82px;height:100%;align-items:start;padding-top:6px;}
+.sdg-left p{font-size:29px;line-height:1.45;color:var(--dim);margin:28px 0 0;}
+.sdg-left p strong{color:var(--text);font-weight:600;}
+.sdg-list{border-top:1px solid var(--line-strong);}
+.sdg-item{display:grid;grid-template-columns:84px 1fr;gap:22px;padding:20px 0;border-bottom:1px solid var(--line);align-items:baseline;}
+.sdg-item .n{font-family:var(--mono);font-size:34px;color:var(--green);letter-spacing:-.03em;}
+.sdg-item h4{font-size:22px;margin:0 0 5px;font-weight:700;letter-spacing:-.01em;}
+.sdg-item p{font-size:17px;line-height:1.4;color:var(--dim);margin:0;}
+.sdg-note{
+  margin-top:20px;font-family:var(--mono);font-size:15px;color:var(--amber);
+  border-left:2px solid var(--amber);padding-left:14px;line-height:1.45;
+}
+
+/* ---------- 06 steps ---------- */
+.steps{
+  display:grid;grid-template-columns:repeat(8,1fr);gap:0;
+  border-top:1px solid var(--line-strong);margin-top:44px;
+}
+.step{padding:26px 16px 0 0;border-right:1px solid var(--line);position:relative;min-height:330px;}
+.step:last-child{border-right:0;}
+.step::before{
+  content:"";position:absolute;top:-5px;left:0;width:26px;height:2px;background:var(--dimmer);
+}
+.step:nth-child(3)::before,.step:nth-child(8)::before{background:var(--amber);width:44px;}
+.step .n{font-family:var(--mono);font-size:15px;color:var(--dimmer);letter-spacing:.1em;}
+.step h3{font-size:23px;line-height:1.12;margin:14px 0 12px;font-weight:700;letter-spacing:-.02em;max-width:170px;}
+.step .time{font-family:var(--mono);font-size:14px;color:var(--green);letter-spacing:.04em;margin-bottom:14px;}
+.step p{font-size:16px;line-height:1.45;color:var(--dim);margin:0;max-width:176px;}
+
+.breaks{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line-strong);margin-top:28px;}
+.brk{padding:18px 30px 0 0;border-right:1px solid var(--line);}
+.brk:last-child{border-right:0;}
+.brk .k{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);}
+.brk p{font-size:17px;line-height:1.45;color:var(--dim);margin:9px 0 0;max-width:440px;}
+.brk p b{color:var(--text);font-weight:600;}
+
+.steps-foot{
+  margin-top:auto;display:flex;justify-content:space-between;align-items:center;
+  border-top:1px solid var(--line);padding-top:20px;font-family:var(--mono);font-size:17px;color:var(--dim);
+}
+.steps-foot b{color:var(--text);font-weight:500;}
+
+/* ---------- 07 modules ---------- */
+.mod-top{display:flex;align-items:flex-end;gap:64px;margin-top:34px;border-bottom:1px solid var(--line-strong);padding-bottom:26px;}
+.mod-num{font-family:var(--mono);font-size:88px;line-height:.9;letter-spacing:-.05em;color:var(--green);}
+.mod-num .u{font-size:22px;color:var(--dim);letter-spacing:0;}
+.mod-cap{font-size:18px;line-height:1.4;color:var(--dim);max-width:340px;padding-bottom:8px;}
+.mod-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:8px;}
+.mod{padding:22px 30px 22px 0;border-bottom:1px solid var(--line);border-right:1px solid var(--line);}
+.mod:nth-child(3n){border-right:0;}
+.mod h4{font-size:22px;margin:0 0 7px;font-weight:700;letter-spacing:-.01em;}
+.mod h4 .tick{color:var(--green);font-family:var(--mono);font-size:16px;margin-right:8px;}
+.mod p{font-size:16px;line-height:1.4;color:var(--dim);margin:0;}
+.mod.dev h4{color:var(--dim);}
+.mod.dev h4 .tick{color:var(--dimmer);}
+.mod.dev p{color:var(--dimmer);}
+.mod-note{
+  margin-top:auto;font-family:var(--mono);font-size:16px;color:var(--dimmer);
+  display:flex;justify-content:space-between;border-top:1px solid var(--line);padding-top:16px;
+}
+.mod-note b{color:var(--green);font-weight:500;}
+
+/* ---------- 08 local ---------- */
+.local-wrap{display:grid;grid-template-columns:1fr 1fr;gap:72px;height:auto;align-items:start;padding-top:4px;}
+.loc-block{border-top:1px solid var(--line-strong);padding-top:22px;}
+.loc-block .cap{font-family:var(--mono);font-size:14px;letter-spacing:.18em;text-transform:uppercase;color:var(--green);}
+.loc-block .big{font-family:var(--mono);font-size:66px;letter-spacing:-.04em;line-height:1;margin:12px 0 6px;}
+.loc-block .big small{font-size:22px;color:var(--dim);letter-spacing:0;margin-left:16px;}
+.loc-block .sub{font-size:18px;color:var(--dim);line-height:1.4;}
+.loc-rows{margin-top:20px;border-top:1px solid var(--line);}
+.loc-row{display:flex;justify-content:space-between;gap:18px;padding:12px 0;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:16px;}
+.loc-row .k{color:var(--dimmer);}
+.loc-row .v{color:var(--text);text-align:right;}
+.uni-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;}
+.uni{
+  font-family:var(--mono);font-size:15px;padding:7px 11px;border:1px solid var(--line-strong);color:var(--text);
+}
+
+
+.loc-strip{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line-strong);margin-top:34px;}
+.loc-strip div{padding:18px 24px 0 0;border-right:1px solid var(--line);font-size:16px;line-height:1.35;color:var(--dim);}
+.loc-strip div:last-child{border-right:0;}
+.loc-strip b{display:block;font-family:var(--mono);font-size:30px;letter-spacing:-.02em;color:var(--green);margin-bottom:6px;font-weight:400;word-spacing:-.40em;}
+
+.local-callout{margin-top:24px;border-left:2px solid var(--amber);padding:2px 0 2px 18px;display:flex;gap:16px;align-items:flex-start;}
+.local-callout p{font-size:23px;line-height:1.4;color:var(--text);margin:0;max-width:1450px;}
+.local-callout b{color:var(--amber);font-weight:600;}
+
+.uni.en{border-color:rgba(125,242,168,.45);color:var(--green);}
+
+/* ---------- 09 compare ---------- */
+.cmp{
+  display:grid;grid-template-columns:1.15fr repeat(4,1fr);gap:0;
+  border-top:1px solid var(--line-strong);margin-top:34px;
+}
+.cmp .cell{padding:20px 18px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);font-size:18px;line-height:1.3;color:var(--dim);}
+.cmp .cell:nth-child(5n){border-right:0;}
+.cmp .h{background:var(--panel);font-family:var(--mono);font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:var(--text);padding-top:20px;padding-bottom:20px;}
+.cmp .h.good{color:var(--green);}
+.cmp .rk{font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--dimmer);padding-top:24px;}
+.cmp .v{color:var(--text);}
+.cmp .v.good{color:var(--green);}
+.cmp .v.warn{color:var(--amber);}
+
+.cmp-concl{margin-top:26px;padding-top:20px;border-top:1px solid var(--line-strong);font-size:24px;line-height:1.4;color:var(--text);}
+.cmp-concl b{color:var(--green);font-weight:600;}
+
+.cmp-note{
+  margin-top:16px;display:flex;gap:16px;align-items:flex-start;
+  font-family:var(--mono);font-size:15px;line-height:1.45;color:var(--dimmer);
+  border-top:1px solid var(--line);padding-top:16px;
+}
+.cmp-note b{color:var(--amber);font-weight:500;}
+
+/* ---------- 10 impact ---------- */
+.chain{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid var(--line-strong);margin-top:34px;}
+.chain .node{padding:20px 26px 20px 0;border-right:1px solid var(--line);position:relative;}
+.chain .node:last-child{border-right:0;}
+.chain .node::after{
+  content:"→";position:absolute;right:-9px;top:18px;background:var(--ink);
+  color:var(--dimmer);font-family:var(--mono);font-size:18px;padding:0 4px;
+}
+.chain .node:last-child::after{display:none;}
+.chain .cap{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--dimmer);}
+.chain .t{font-size:21px;line-height:1.3;margin-top:10px;color:var(--text);}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:24px;border-top:1px solid var(--line);}
+.metric{padding:22px 26px 0 0;border-right:1px solid var(--line);}
+.metric:last-child{border-right:0;}
+.metric .n{font-family:var(--mono);font-size:46px;letter-spacing:-.04em;color:var(--green);line-height:1;}
+.metric .d{font-size:16px;line-height:1.35;color:var(--dim);margin-top:10px;max-width:250px;}
+.measure{display:grid;grid-template-columns:1fr 1fr;gap:56px;border-top:1px solid var(--line-strong);margin-top:30px;padding-top:20px;}
+.measure .k{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--dimmer);}
+.measure p{font-size:18px;line-height:1.45;color:var(--dim);margin:8px 0 0;max-width:660px;}
+.measure p b{color:var(--text);font-weight:600;}
+.impact-line{
+  margin-top:auto;border-top:1px solid var(--line);padding-top:18px;
+  font-size:23px;color:var(--text);
+}
+.impact-line span{color:var(--green);}
+
+/* ---------- 11 moat ---------- */
+.moat{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--line-strong);margin-top:38px;}
+.moat .row{display:grid;grid-template-columns:56px 1fr;gap:18px;padding:30px 34px 30px 0;border-bottom:1px solid var(--line);}
+.moat .row:nth-child(odd){border-right:1px solid var(--line);padding-right:34px;}
+.moat .n{font-family:var(--mono);font-size:14px;color:var(--green);padding-top:5px;letter-spacing:.1em;}
+.moat h4{font-size:24px;margin:0 0 7px;font-weight:700;letter-spacing:-.01em;}
+.moat p{font-size:18px;line-height:1.45;color:var(--dim);margin:0;max-width:540px;}
+.moat-quote{margin-top:auto;font-size:40px;line-height:1.25;letter-spacing:-.02em;font-weight:600;max-width:1250px;}
+.moat-quote em{font-style:normal;color:var(--green);}
+.moat-foot{
+  margin-top:22px;display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line-strong);padding-top:18px;gap:40px;
+}
+.moat-foot .a{font-family:var(--mono);font-size:17px;color:var(--dimmer);}
+.moat-foot .b{font-family:var(--mono);font-size:17px;color:var(--green);}
+
+/* ---------- 12 business ---------- */
+.biz{display:grid;grid-template-columns:.85fr 1.15fr;gap:76px;margin-top:36px;}
+.free{border:1px solid rgba(125,242,168,.35);background:var(--green-dim);padding:28px 30px;}
+.free .cap{font-family:var(--mono);font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--green);}
+.free .big{font-size:38px;line-height:1.15;font-weight:700;letter-spacing:-.02em;margin:14px 0 16px;}
+.free ul{margin:0;padding:0;list-style:none;}
+.free li{font-size:17px;color:var(--text);padding:8px 0;border-top:1px solid rgba(125,242,168,.18);display:flex;gap:12px;}
+.free li .m{color:var(--green);font-family:var(--mono);}
+.biz-rows{border-top:1px solid var(--line-strong);}
+.biz-row{display:grid;grid-template-columns:52px 1fr auto;gap:20px;padding:17px 0;border-bottom:1px solid var(--line);align-items:baseline;}
+.biz-row .n{font-family:var(--mono);font-size:13px;color:var(--dimmer);}
+.biz-row .t{font-size:19px;line-height:1.35;color:var(--text);}
+.biz-row .t small{display:block;font-size:15px;color:var(--dim);margin-top:3px;}
+.biz-row .p{font-family:var(--mono);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--green);white-space:nowrap;}
+.biz-zero{margin-top:auto;display:flex;align-items:baseline;gap:26px;border-top:1px solid var(--line);padding-top:18px;}
+.biz-zero .n{font-family:var(--mono);font-size:56px;line-height:1;color:var(--green);letter-spacing:-.03em;word-spacing:-.24em;}
+.biz-zero .d{font-size:19px;line-height:1.4;color:var(--dim);max-width:560px;}
+.biz-note{
+  margin-top:auto;border-left:2px solid var(--amber);padding:4px 0 4px 16px;
+  font-family:var(--mono);font-size:15px;line-height:1.5;color:var(--dim);
+}
+.biz-note b{color:var(--amber);font-weight:500;}
+
+/* ---------- 13 72h ---------- */
+.hours{display:grid;grid-template-columns:1.15fr 1fr .85fr;gap:0;border-top:1px solid var(--line-strong);margin-top:34px;}
+.col{padding:24px 30px 0 0;border-right:1px solid var(--line);}
+.col:last-child{border-right:0;}
+.col .cap{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:18px;}
+.col .cap .t{font-family:var(--mono);font-size:13px;letter-spacing:.18em;text-transform:uppercase;}
+.col .cap .c{font-family:var(--mono);font-size:12px;color:var(--dimmer);}
+.col.must .cap .t{color:var(--green);}
+.col.should .cap .t{color:var(--amber);}
+.col.wont .cap .t{color:var(--dimmer);}
+.col ul{margin:0;padding:0;list-style:none;}
+.col li{font-size:18px;line-height:1.4;color:var(--dim);padding:14px 0;border-top:1px solid var(--line);display:flex;gap:12px;}
+.col li .b{font-family:var(--mono);font-size:12px;color:var(--dimmer);padding-top:3px;flex:none;}
+.col.must li{color:var(--text);}
+.col.wont li{color:var(--dimmer);text-decoration:line-through;text-decoration-color:rgba(138,144,153,.5);}
+.col li small{display:block;font-size:14px;color:var(--dimmer);margin-top:3px;text-decoration:none;}
+
+.done{margin-top:20px;display:flex;gap:14px;align-items:flex-start;border-top:1px solid var(--line-strong);padding-top:16px;font-family:var(--mono);font-size:15px;line-height:1.5;color:var(--dim);}
+.done b{color:var(--green);font-weight:500;}
+
+.hours-foot{
+  margin-top:auto;display:flex;justify-content:space-between;align-items:center;
+  border-top:1px solid var(--line);padding-top:16px;font-family:var(--mono);font-size:15px;color:var(--dim);
+}
+.hours-foot b{color:var(--green);font-weight:500;}
+
+/* ---------- 14 team ---------- */
+.team{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid var(--line-strong);margin-top:36px;}
+.role{padding:24px 28px 0 0;border-right:1px solid var(--line);}
+.role:last-child{border-right:0;}
+.role .n{font-family:var(--mono);font-size:12px;letter-spacing:.16em;color:var(--green);text-transform:uppercase;}
+.role h3{font-size:27px;line-height:1.12;margin:13px 0 12px;font-weight:700;letter-spacing:-.02em;}
+.role p{font-size:16px;line-height:1.45;color:var(--dim);margin:0;max-width:300px;}
+.ritual{
+  margin-top:auto;display:flex;gap:18px;align-items:center;border-top:1px solid var(--line);padding-top:18px;
+  font-family:var(--mono);font-size:16px;color:var(--dim);
+}
+.ritual b{color:var(--text);font-weight:500;}
+.ritual .bar{width:1px;height:14px;background:var(--line-strong);}
+
+/* ---------- 15 close ---------- */
+.close-wrap{display:flex;flex-direction:column;justify-content:center;height:100%;}
+.close-h{
+  font-size:106px;line-height:.96;letter-spacing:-.045em;font-weight:800;margin:0;
+}
+.close-h .en{display:block;color:var(--green);font-size:.84em;line-height:1.02;margin-top:14px;}
+.close-sub{font-family:var(--mono);font-size:24px;color:var(--dim);margin-top:30px;line-height:1.5;max-width:1100px;}
+.close-foot{
+  display:grid;grid-template-columns:1fr auto;gap:40px;align-items:end;
+  margin-top:52px;border-top:1px solid var(--line-strong);padding-top:24px;
+}
+.close-ask .k{font-family:var(--mono);font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--dimmer);}
+.close-ask .v{font-size:25px;line-height:1.4;margin-top:10px;max-width:900px;}
+.close-url{text-align:right;font-family:var(--mono);font-size:20px;color:var(--green);}
+
+/* ---------- nav ---------- */
+.nav{
+  position:fixed;right:26px;bottom:22px;display:flex;align-items:center;gap:8px;z-index:40;
+  font-family:var(--mono);font-size:12px;color:var(--dimmer);
+}
+.nav button{
+  appearance:none;background:transparent;border:1px solid rgba(233,231,226,.18);color:var(--text);
+  width:38px;height:34px;cursor:pointer;font-family:var(--mono);font-size:15px;line-height:1;
+  transition:border-color 160ms ease, color 160ms ease, background-color 160ms ease;
+}
+.nav button:hover{border-color:rgba(125,242,168,.6);color:var(--green);}
+.nav button:focus-visible{outline:2px solid var(--green);outline-offset:2px;}
+.nav .count{min-width:62px;text-align:center;font-variant-numeric:tabular-nums;letter-spacing:.1em;}
+.progress{
+  position:fixed;left:0;top:0;height:2px;width:0;background:var(--green);z-index:50;
+  transition:width 220ms ease-out;
+}
+.hint{
+  position:fixed;left:26px;bottom:24px;z-index:40;font-family:var(--mono);font-size:11px;
+  letter-spacing:.12em;text-transform:uppercase;color:rgba(138,144,153,.55);
+}
+
+
+/* ---------- light theme ---------- */
+.slide.light{
+  background:#EFEAE0;z-index:2;
+  --text:#0B0C0D;--dim:#565C63;--dimmer:#6E747B;
+  --line:rgba(11,12,13,.14);--line-strong:rgba(11,12,13,.3);
+  --green:#0B7A46;--amber:#9A5B00;--panel:#E4DED2;
+}
+.slide.light .ghost{color:rgba(11,12,13,.055);}
+.slide.light .stage{}
+
+/* ---------- title globe ---------- */
+.globe{position:absolute;right:-6px;top:96px;width:600px;height:600px;color:rgba(233,231,226,.46);pointer-events:none;}
+
+/* ---------- funnel ---------- */
+.funnel-wrap{display:grid;grid-template-columns:1.6fr .8fr;gap:64px;margin-top:34px;}
+.funnel{display:flex;flex-direction:column;gap:18px;}
+.fbar{display:grid;grid-template-columns:210px 1fr 150px;align-items:center;gap:18px;}
+.fbar .lab{font-family:var(--mono);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);line-height:1.3;}
+.fbar .track{height:68px;background:rgba(11,12,13,.07);}
+.fbar .fill{height:100%;background:var(--text);}
+.fbar .fill.g{background:var(--green);}
+.fbar .val{font-family:var(--mono);font-size:28px;text-align:right;letter-spacing:-.03em;color:var(--text);word-spacing:-.4em;}
+.funnel-side{border-top:1px solid var(--line-strong);display:flex;flex-direction:column;}
+.fs-item{padding:16px 0;border-bottom:1px solid var(--line);}
+.fs-item .n{font-family:var(--mono);font-size:44px;letter-spacing:-.04em;color:var(--green);line-height:1;word-spacing:-.4em;}
+.fs-item .d{font-size:15px;line-height:1.35;color:var(--dim);margin-top:8px;}
+.fs-note{margin-top:auto;padding-top:18px;font-size:16px;line-height:1.45;color:var(--text);border-top:1px solid var(--line);display:flex;gap:12px;}
+.fs-note .marker{background:var(--amber);flex:none;margin-top:6px;}
+.src-line{font-family:var(--mono);font-size:12px;color:var(--dimmer);margin:22px 0 0;letter-spacing:.04em;}
+
+/* ---------- demo window ---------- */
+.demo{display:grid;grid-template-columns:1.5fr .5fr;gap:44px;margin-top:30px;flex:1;min-height:0;}
+.win{border:1px solid var(--line-strong);background:#0A0C0F;display:flex;flex-direction:column;min-height:0;overflow:hidden;}
+.win-bar{display:flex;align-items:center;gap:7px;padding:11px 14px;border-bottom:1px solid var(--line);background:#0C0F12;}
+.win-bar .d{width:8px;height:8px;border-radius:50%;background:#2A2E33;}
+.win-bar .t{margin-left:12px;font-family:var(--mono);font-size:11px;color:var(--dimmer);letter-spacing:.12em;text-transform:uppercase;}
+.win-body{padding:24px 26px;font-family:var(--mono);font-size:15px;display:flex;flex-direction:column;gap:16px;flex:1;}
+.cmd{color:var(--text);}
+.cmd .p{color:var(--green);}
+.out{color:var(--dimmer);font-size:13px;line-height:1.5;letter-spacing:.02em;}
+.out.ok{color:var(--green);}
+.tbl{display:grid;grid-template-columns:110px 220px 1fr;border-top:1px solid var(--line-strong);}
+.tbl .h{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--dimmer);padding:7px 0;border-bottom:1px solid var(--line);}
+.tbl .c{font-size:11px;color:var(--dim);padding:7px 0;border-bottom:1px solid var(--line);}
+.tbl .c.g{color:var(--green);}
+.ucards{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);}
+.ucard{background:#0C0E11;padding:15px 14px;}
+.uc-top{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--text);letter-spacing:.02em;}
+.uc-top .r{color:var(--amber);font-size:9px;letter-spacing:.12em;text-transform:uppercase;padding-top:2px;}
+.u-row{display:flex;justify-content:space-between;gap:8px;font-size:11px;color:var(--dimmer);padding-top:8px;border-top:1px solid var(--line);margin-top:9px;}
+.u-row .hi{color:var(--text);}
+.demo-side{border-top:1px solid var(--line-strong);display:flex;flex-direction:column;}
+.ds{padding:14px 0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:34px 1fr;gap:10px;}
+.ds .k{font-family:var(--mono);font-size:10px;color:var(--green);padding-top:3px;letter-spacing:.1em;}
+.ds p{font-size:14px;line-height:1.4;color:var(--dim);margin:0;}
+.demo-note{margin-top:auto;font-family:var(--mono);font-size:12px;line-height:1.5;color:var(--dimmer);border-top:1px solid var(--line);padding-top:12px;}
+
+/* ---------- motion ---------- */
+@keyframes rise{
+  from{opacity:0;transform:translateY(16px);}
+  to{opacity:1;transform:translateY(0);}
+}
+@keyframes fadeOnly{
+  from{opacity:0;}
+  to{opacity:1;}
+}
+@keyframes blink{
+  0%,49%{opacity:1;}
+  50%,100%{opacity:0;}
+}
+
+.slide.is-active .rv{
+  animation:rise 520ms cubic-bezier(.16,.84,.28,1) both;
+  animation-delay:calc(var(--i,0) * 55ms + 60ms);
+}
+
+/* Reduced motion: global safety net, then tiered overrides */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.01ms !important;
+    scroll-behavior:auto !important;
+  }
+  .slide{transition:opacity 120ms linear !important;}
+  .slide.is-active .rv{
+    animation:fadeOnly 160ms linear both !important;
+    animation-delay:calc(var(--i,0) * 20ms) !important;
+    transform:none !important;
+  }
+  .title-sub .cursor{animation:none !important;opacity:1 !important;}
+  .nav button{transition:none !important;}
+}
+html.reduce *,
+html.reduce *::before,
+html.reduce *::after{
+  animation-duration:.01ms !important;
+  animation-iteration-count:1 !important;
+  transition-duration:.01ms !important;
+  scroll-behavior:auto !important;
+}
+html.reduce .slide{transition:opacity 120ms linear !important;}
+html.reduce .slide.is-active .rv{
+  animation:fadeOnly 160ms linear both !important;
+  animation-delay:calc(var(--i,0) * 20ms) !important;
+  transform:none !important;
+}
+html.reduce .title-sub .cursor{animation:none !important;opacity:1 !important;}
+html.reduce .nav button{transition:none !important;}
+
+/* Static render mode (?static=1) for PDF/screenshots */
+html.static .slide{transition:none !important;}
+html.static .rv{animation:none !important;opacity:1 !important;transform:none !important;}
+html.static .title-sub .cursor{animation:none !important;opacity:1 !important;}
+html.static .progress{transition:none !important;}
+html.static .nav,
+html.static .hint,
+html.static .progress{display:none !important;}
+
+@media print{
+  @page{size:1920px 1080px;margin:0;}
+  html,body{overflow:visible;background:#07080A;}
+  .viewport{position:static;}
+  .stage{position:static;transform:none;width:1920px;height:1080px;}
+  .slide{position:relative;visibility:visible;opacity:1;page-break-after:always;break-after:page;}
+  .nav,.hint,.progress{display:none;}
+}
+</style>
+</head>
+<body>
+<div class="progress" id="progress" role="progressbar" aria-label="Прогресс презентации" aria-valuemin="1" aria-valuemax="15" aria-valuenow="1"></div>
+<div class="viewport">
+  <div class="stage" id="stage">
+
+    <!-- ================= 01 ================= -->
+    <section class="slide" aria-roledescription="slide" aria-label="1 из 15">
+      <header class="head">
+        <span class="brand">LOGOS<span class="dot">/</span>2026</span>
+        <span>ADMISSIONHACK</span>
+        <span class="sect">01 / ТИТУЛ</span>
+      </header>
+      <div class="body title-grid">
+        <div class="title-main">
+          <p class="eyebrow rv" style="--i:0">72 часа · Бишкек · 23–25 октября</p>
+          <h1 class="rv" style="--i:1">Admission<br>Hack</h1>
+          <p class="title-sub rv" style="--i:2"><span class="prompt">$</span> система поступления, расшифрованная<span class="cursor" aria-hidden="true"></span></p>
+        </div>
+
+        <svg class="globe rv" style="--i:2" viewBox="0 0 560 560" aria-hidden="true">
+          <g fill="none" stroke="currentColor" stroke-width="1">
+            <circle cx="280" cy="280" r="238" opacity=".55"/>
+            <ellipse cx="280" cy="280" rx="238" ry="62" opacity=".28"/>
+            <ellipse cx="280" cy="280" rx="238" ry="138" opacity=".24"/>
+            <ellipse cx="280" cy="280" rx="238" ry="200" opacity=".16"/>
+            <ellipse cx="280" cy="280" rx="74" ry="238" opacity=".26"/>
+            <ellipse cx="280" cy="280" rx="152" ry="238" opacity=".22"/>
+            <ellipse cx="280" cy="280" rx="212" ry="238" opacity=".14"/>
+            <line x1="42" y1="280" x2="518" y2="280" opacity=".22"/>
+            <line x1="280" y1="42" x2="280" y2="518" opacity=".22"/>
+          </g>
+          <g fill="none" stroke="#7DF2A8" stroke-width="1.3" opacity=".62">
+            <path d="M312 330 Q 232 244 186 166"/>
+            <path d="M312 330 Q 396 262 452 210"/>
+            <path d="M312 330 Q 252 356 196 358"/>
+            <path d="M312 330 Q 196 318 96 284"/>
+            <path d="M312 330 Q 424 344 472 300"/>
+            <path d="M312 330 Q 214 292 142 286"/>
+          </g>
+          <g fill="#7DF2A8">
+            <circle cx="312" cy="330" r="5"/>
+            <circle cx="312" cy="330" r="12" fill="none" stroke="#7DF2A8" stroke-width="1" opacity=".55"/>
+          </g>
+          <g fill="#8A9099" font-family="ui-monospace, monospace" font-size="11" letter-spacing="1.4">
+            <text x="168" y="158">RU</text>
+            <text x="460" y="203">CN</text>
+            <text x="174" y="372">TR</text>
+            <text x="80" y="278">US</text>
+            <text x="480" y="306">KR</text>
+            <text x="104" y="280">DE</text>
+            <text x="324" y="352" fill="#7DF2A8">BISHKEK</text>
+          </g>
+        </svg>
+
+        <div class="title-meta rv" style="--i:3">
+          <span><span class="k">цели</span> <span class="v">SDG 4 · 10</span></span>
+          <span><span class="k">покрытие</span> <span class="v">1 506 вузов · 13 стран</span></span>
+          <span><span class="k">доступ</span> <span class="v">бесплатно · без аккаунта</span></span>
+        </div>
+      </div>
+      <footer class="foot">
+        <span class="coords">42.87°N 74.59°E · BISHKEK</span>
+        <span>UNIVERSITY ADMISSIONS, DECODED</span>
+        <span class="pageno"><b>01</b> / 15</span>
+      </footer>
+    </section>
+
+    <!-- ================= 02 ================= -->
+    <section class="slide" aria-roledescription="slide" aria-label="2 из 15">
+      <span class="ghost" aria-hidden="true">02</span>
+      <header class="head">
+        <span class="brand">LOGOS<span class="dot">/</span>2026</span>
+        <span>ADMISSIONHACK</span>
+        <span class="sect">02 / КЕЙС</span>
+      </header>
+      <div class="body">
+        <div class="case-wrap">
+          <div>
+            <p class="eyebrow rv" style="--i:0">одна история вместо статистики</p>
+            <h2 class="case-quote rv" style="--i:1">Она узнала о дедлайне в марте.<br><span>Дедлайн был в январе.</span></h2>
+            <p class="body-txt rv" style="--i:2">Айпери, 17, Бишкек. ОРТ 145 — выше среднего по стране. Хочет учиться в Германии. В семье нет $5 000 на консультанта. Она не провалила поступление. Она не знала правил.</p>
+          </div>
+          <div class="case-facts rv" style="--i:3">
+            <div class="case-fact"><span class="k">ОРТ</span><span class="v">145</span></div>
+            <div class="case-fact"><span class="k">цель</span><span class="v">Германия, CS</span></div>
+            <div class="case-fact"><span class="k">бюджет на консультанта</span><span class="v bad">$0</span></div>
+            <div class="case-fact"><span class="k">узнала о дедлайне</span><span class="v bad">в марте</span></div>
+          </div>
+        </div>
+        <p class="case-foot rv" style="--i:4"><span class="marker"></span>Разница между ней и абитуриентом с консультантом — не баллы. Доступ к процессу.</p>
+      </div>
+      <footer class="foot">
+        <span class="coords">42.87°N 74.59°E · BISHKEK</span>
+        <span>CASE / 01</span>
+        <span class="pageno"><b>02</b> / 15</span>
+      </footer>
+    </section>
+
+    <!-- ================= 03 ================= -->
+    <section class="slide light" aria-roledescription="slide" aria-label="3 из 15">
+      <span class="ghost" aria-hidden="true">03</span>
+      <header class="head">
+        <span class="brand">LOGOS<span class="dot">/</span>2026</span>
+        <span>ADMISSIONHACK</span>
+        <span class="sect">03 / МАСШТАБ</span>
+      </header>
+      <div class="body">
+        <p class="eyebrow rv" style="--i:0">Кыргызстан · 2025</p>
+        <h2 class="rv" style="--i:1">57 458 абитуриентов.<br><em>10 000 грантов.</em></h2>
+        <div class="funnel-wrap">
+          <div class="funnel rv" style="--i:2">
+            <div class="fbar"><span class="lab">сдавали ОРТ</span><div class="track"><div class="fill" style="width:100%"></div></div><span class="val" data-count="57458">57 458</span></div>
+            <div class="fbar"><span class="lab">поступили в вузы</span><div class="track"><div class="fill" style="width:74.8%"></div></div><span class="val" data-count="43000" data-prefix="~">~43 000</span></div>
+            <div class="fbar"><span class="lab">гос. гранты</span><div class="track"><div class="fill g" style="width:17.4%"></div></div><span class="val" data-count="10000">10 000</span></div>
+            <div class="fbar"><span class="lab">гранты заполнены</span><div class="track"><div class="fill g" style="width:15.1%"></div></div><span class="val" data-count="8700" data-prefix="~">~8 700</span></div>
+          </div>
+          <div class="funnel-side rv" style="--i:3">
+            <div class="fs-item"><div class="n" data-count="20042">20 042</div><div class="d">граждан КР учатся в вузах за рубежом</div></div>
+            <div class="fs-item"><div class="n" data-count="5000" data-prefix="$">$5 000</div><div class="d">типичная цена частного консультанта</div></div>
+            <div class="fs-note"><span class="marker"></span><span><b>~1 300 грантовых мест остались пустыми.</b> Это дефицит информации, а не мест.</span></div>
+          </div>
+        </div>
+        <p class="insight rv" style="--i:4">Каждый год десятки тысяч семей проходят один и тот же путь — <b>в одиночку</b>. Ошибка стоит не баллов, а года.</p>
+        <p class="src-line rv" style="--i:5">Источники: ЦООМО, отчёт ОРТ-2025 · МИД КР, январь 2025</p>
+      </div>
+      <footer class="foot">
+        <span class="coords">42.87°N 74.59°E · BISHKEK</span>
+        <span>SOURCES: TESTING.KG · MFA KR</span>
+        <span class="pageno"><b>03</b> / 15</span>
+      </footer>
+    </section>
+
+    <!-- ================= 04 ================= -->
+    <section class="slide" aria-roledescription="slide" aria-label="4 из 15">
+      <span class="ghost" aria-hidden="true">04</span>
+      <header class="head">
+        <span class="brand">LOGOS<span class="dot">/</span>2026</span>
+        <span>ADMISSIONHACK</span>
+        <span class="sect">04 / ДИАГНОЗ</span>
+      </header>
+      <div class="body">
+        <p class="eyebrow rv" style="--i:0">почему проблема не решается поиском в интернете</p>
+        <h2 class="rv" style="--i:1">Информация есть.<br><span class="thin">Нет системы.</span></h2>
+        <div class="causes rv" style="--i:2">
+          <div class="cause">
+            <div class="idx">01 / FRAGMENTATION</div>
+            <h3>Фрагментация</h3>
+            <p>13 стран, 1 506 вузов, разные системы документов и оценки. Это нельзя удержать в голове — и нельзя гуглить по одному вопросу за раз.</p>
+          </div>
+          <div class="cause">
+            <div class="idx">02 / TIMING</div>
+            <h3>Тайминг</h3>
+            <p>Дедлайны, срок действия тестов, апостиль, визовые окна. Ошибка стоит не баллов, а целого года. Календарь важнее каталога.</p>
+          </div>
+          <div class="cause">
+            <div class="idx">03 / ASYMMETRY</div>
+            <h3>Асимметрия</h3>
+            <p>У семьи с консультантом есть последовательность действий. У семьи без него — набор слухов. Разница — деньги, не способности.</p>
+          </div>
+        </div>
+        <p class="insight rv" style="--i:3">Проблема не в дефиците информации. Проблема в <b>доступе к знанию системы</b>.</p>
+      </div>
+      <footer class="foot">
+        <span class="coords">42.87°N 74.59°E · BISHKEK</span>
+        <span>DIAGNOSIS</span>
+        <span class="pageno"><b>04</b> / 15</span>
+      </footer>
+    </section>
+
+    <!-- ================= 05 ================= -->
+    <section class="slide" aria-roledescription="slide" aria-label="5 из 15">
+      <span class="ghost" aria-hidden="true">05</span>
+      <header class="head">
+        <span class="brand">LOGOS<span class="dot">/</span>2026</span>
+        <span>ADMISSIONHACK</span>
+        <span class="sect">05 / ПОЧЕМУ ЗДЕСЬ</span>
+      </header>
+      <div class="body">
+        <p class="eyebrow rv" style="--i:0">честный ответ на первый вопрос жюри</p>
+        <h2 class="rv" style="--i:1" style="max-width:1400px">Это не климатический проект.<br><span class="thin">И вот почему он здесь.</span></h2>
+        <div class="sdg-wrap">
+          <div class="sdg-left rv" style="--i:2">
+            <p><strong>LOGOS — про устойчивое развитие, а не только про климат.</strong> Устойчивое развитие начинается с людей. Без доступа к образованию не будет инженеров для ВИЭ, аналитиков для климатических данных и специалистов по воде.</p>
+            <p>Наш продукт — SDG 4 и SDG 10. И это кадровый фундамент для всех четырёх треков хакатона.</p>
+            <p class="sdg-note">Мы не притягиваем трек. Мы называем свою цель — и показываем Кыргызстан в продукте, а не только в презентации.</p>
+          </div>
+          <div class="sdg-list rv" style="--i:3">
+            <div class="sdg-item"><span class="n">04</span><div><h4>Качественное образование</h4><p>Убираем барьер, не связанный со способностями</p></div></div>
+            <div class="sdg-item"><span class="n">10</span><div><h4>Сокращение неравенства</h4><p>Город и регион, семья с консультантом и без</p></div></div>
+            <div class="sdg-item"><span class="n">08</span><div><h4>Достойная работа</h4><p>Меньше ошибок в выборе профессии, страны и траектории</p></div></div>
+            <div class="sdg-item"><span class="n">17</span><div><h4>Партнёрства</h4><p>Открытые данные, вузы, школы, стипендиальные программы</p></div></div>
+          </div>
+        </div>
+      </div>
+      <footer class="foot">
+        <span class="coords">42.87°N 74.59°E · BISHKEK</span>
+        <span>SDG MAPPING</span>
+        <span class="pageno"><b>05</b> / 15</span>
+      </footer>
+    </section>
+
+    <!-- ================= 06 ================= -->
+    <section class="slide" aria-roledescription="slide" aria-label="6 из 15">
+      <span class="ghost" aria-hidden="true">06</span>
+      <header class="head">
+        <span class="brand">LOGOS<span class="dot">/</span>2026</span>
+        <span>ADMISSIONHACK</span>
+        <span class="sect">06 / ПРОДУКТ</span>
+      </header>
+      <div class="body">
+        <p class="eyebrow rv" style="--i:0">ядро продукта — не каталог, а процесс</p>
+        <h2 class="rv" style="--i:1">Восемь шагов. Восемь мест,<br>где люди теряют год.</h2>
+        <div class="steps rv" style="--i:2">
+          <div class="step"><div class="n">01</div><h3>Destination &amp; field</h3><div class="time">12–18 мес.</div><p>Приоритеты, сравнение стран, язык обучения</p></div>
+          <div class="step"><div class="n">02</div><h3>Shortlist</h3><div class="time">12–15 мес.</div><p>2–3 reach / 3–4 match / 2 safety, конвертация оценок</p></div>
+          <div class="step"><div class="n">03</div><h3>Exams</h3><div class="time">8–12 мес.</div><p>SAT, IELTS, TOEFL, DET, CSCA, ACT, GRE, UCAT</p></div>
+          <div class="step"><div class="n">04</div><h3>Documents</h3><div class="time">6–10 мес.</div><p>Транскрипты, апостиль, рекомендации, паспорт</p></div>
+          <div class="step"><div class="n">05</div><h3>Essays</h3><div class="time">4–8 мес.</div><p>Промпты, «показывай, а не заявляй», лимиты UCAS</p></div>
+          <div class="step"><div class="n">06</div><h3>Apply &amp; track</h3><div class="time">окт–июль</div><p>Таблица дедлайнов, официальная отправка баллов</p></div>
+          <div class="step"><div class="n">07</div><h3>Decide</h3><div class="time">дек–май</div><p>Полная стоимость, условные офферы, депозит 1 мая</p></div>
+          <div class="step"><div class="n">08</div><h3>Visa &amp; arrival</h3><div class="time">3–5 мес.</div><p>Блокированный счёт, GIC, I-20, страховка</p></div>
+        </div>
+<div class="breaks rv" style="--i:3">
+          <div class="brk"><span class="k">шаг 03 · exams</span><p>Результат IELTS действует <b>два года</b>. Сдал в 10 классе — к подаче он уже истёк.</p></div>
+          <div class="brk"><span class="k">шаг 08 · visa</span><p>Блокированный счёт в Германии — <b>≈11–12 тыс. €</b> на год. Узнают за месяц до визы.</p></div>
+          <div class="brk"><span class="k">шаг 04 · documents</span><p>Апостиль аттестата делается <b>заранее</b>. В июле очередь делает его бесполезным.</p></div>
+        </div>
+        <div class="steps-foot rv" style="--i:4">
+          <span>Каждый шаг: тайминг · чек-лист · <b>«что здесь ломается»</b></span>
+          <span>Порядок важнее списка</span>
+        </div>
+      </div>
+      <footer class="foot">
+        <span class="coords">42.87°N 74.59°E · BISHKEK</span>
+        <span>THE 8-STEP FRAMEWORK</span>
+        <span class="pageno"><b>06</b> / 15</span>
+      </footer>
+    </section>
+
+    <!-- ================= 07 ================= -->
+    <section class="slide" aria-roledescription="slide" aria-label="7 из 15">
+      <span class="ghost" aria-hidden="true">07</span>
+      <header class="head">
+        <span class="brand">LOGOS<span class="dot">/</span>2026</span>
+        <span>ADMISSIONHACK</span>
+        <span class="sect">07 / ДЕМО</span>
+      </header>
+      <div class="body">
+        <p class="eyebrow rv" style="--i:0">заготовки нельзя — собираем на месте</p>
+        <h2 class="rv" style="--i:1">Что увидит жюри за 3 минуты.</h2>
+        <div class="demo">
+          <div class="win rv" style="--i:2">
+            <div class="win-bar"><span class="d"></span><span class="d"></span><span class="d"></span><span class="t">admissionhack · demo</span></div>
+            <div class="win-body">
+              <div class="cmd"><span class="p">$</span> find --universities --country DE --field cs</div>
+              <div class="out">3 matches · tuition 0–1 500 € · deadline 15 jan</div>
+              <div class="ucards">
+                <div class="ucard"><div class="uc-top"><span>Программа A</span><span class="r">reach</span></div><div class="u-row"><span>CS · EN</span><span class="hi">€0</span></div><div class="u-row"><span>дедлайн</span><span class="hi">15 янв</span></div></div>
+                <div class="ucard"><div class="uc-top"><span>Программа B</span><span class="r">match</span></div><div class="u-row"><span>CS · EN</span><span class="hi">€0</span></div><div class="u-row"><span>дедлайн</span><span class="hi">31 мар</span></div></div>
+                <div class="ucard"><div class="uc-top"><span>Программа C</span><span class="r">safety</span></div><div class="u-row"><span>CS · EN</span><span class="hi">€1 500</span></div><div class="u-row"><span>дедлайн</span><span class="hi">15 июл</span></div></div>
+              </div>
+              <div class="cmd"><span class="p">$</span> checklist --step 03</div>
+              <div class="out"><span style="color:var(--green)">[✓]</span> IELTS 6.5 — действует до 04.2028<br><span style="color:var(--amber)">[!]</span> SAT — регистрация закрывается 07.11<br><span style="color:var(--dimmer)">[ ]</span> TOEFL — не требуется</div>
+              <div class="cmd"><span class="p">$</span> compare --grant KG --abroad DE</div>
+              <div class="tbl">
+                <div class="h">критерий</div><div class="h">грант КР</div><div class="h">Германия</div>
+                <div class="c">деньги</div><div class="c g">≈ 0</div><div class="c">€0 + €11–12k/год</div>
+                <div class="c">срок</div><div class="c">4 года</div><div class="c">4 года</div>
+                <div class="c">риск</div><div class="c">конкурс</div><div class="c">финансирование</div>
+              </div>
+              <div class="cmd"><span class="p">$</span> provenance --record "Программа A"</div>
+              <div class="out">источник: официальный сайт вуза · проверено 24.10.2026</div>
+              <div class="cmd"><span class="p">$</span> add --to shortlist "Программа A"</div>
+              <div class="out ok">✓ добавлено · до дедлайна 87 дней · документы 2/6</div>
+            </div>
+          </div>
+          <div class="demo-side rv" style="--i:3">
+            <div class="ds"><span class="k">01</span><p>Поиск: страна, направление, стоимость</p></div>
+            <div class="ds"><span class="k">02</span><p>Восемь шагов: где человек сейчас</p></div>
+            <div class="ds"><span class="k">03</span><p>Чек-лист: что просрочено и что сгорит</p></div>
+            <div class="ds"><span class="k">04</span><p>Кыргызстан: ОРТ, гранты, вузы</p></div>
+            <div class="ds"><span class="k">05</span><p>Сравнение: грант против отъезда</p></div>
+            <div class="ds"><span class="k">06</span><p>Провенанс: у каждой цифры источник</p></div>
+            <div class="demo-note">Пример интерфейса. Всё, что в демо, собирается 23–25 октября на месте.</div>
+          </div>
+        </div>
+      </div>
+      <footer class="foot">
+        <span class="coords">42.87°N 74.59°E · BISHKEK</span>
+        <span>DEMO / BUILT ON SITE</span>
+        <span class="pageno"><b>07</b> / 15</span>
+      </footer>
+    </section>
+
+    <!-- ================= 08 ================= -->
+    <section class="slide" aria-roledescription="slide" aria-label="8 из 15">
+      <span class="ghost" aria-hidden="true">08</span>
+      <header class="head">
+        <span class="brand">LOGOS<span class="dot">/</span>2026</span>
+        <span>ADMISSIONHACK</span>
+        <span class="sect">08 / ЛОКАЛЬНЫЙ КОНТУР</span>
+      </header>
+      <div class="body">
+        <p class="eyebrow rv" style="--i:0">то, чего нет ни у одного международного гида</p>
+        <h2 class="rv" style="--i:1">А теперь — <em>Кыргызстан.</em></h2>
+        <div class="local-wrap">
+          <div class="rv" style="--i:2">
+            <div class="loc-block">
+              <div class="cap">Кыргызстан / ОРТ</div>
+              <div class="big">57 458<small>участников, 2025</small></div>
+              <div class="sub">Средний балл 127,2 · 67,3 % прошли порог 110 · 54 золотых сертификата</div>
+              <div class="loc-rows">
+                <div class="loc-row"><span class="k">грантовых мест</span><span class="v num">~10 000</span></div>
+                <div class="loc-row"><span class="k">заполнено</span><span class="v num">~8 700</span></div>
+                <div class="loc-row"><span class="k">пустых мест</span><span class="v num">~1 300</span></div>
+              </div>
+            </div>
+            <div class="loc-block" style="margin-top:34px">
+              <div class="cap">Казахстан / ЕНТ</div>
+              <div class="sub" style="margin-top:10px">Структура теста, пороги, профильные предметы, гранты и сельские квоты — в том же формате.</div>
+            </div>
+          </div>
+          <div class="rv" style="--i:3">
+            <div class="loc-block">
+              <div class="cap">Вузы в продукте</div>
+              <div class="uni-list">
+                <span class="uni en">КНУ</span><span class="uni en">КРСУ</span><span class="uni en">АУЦА</span>
+                <span class="uni">Ала-Тоо</span><span class="uni">ОшГУ</span><span class="uni">Манас</span>
+                <span class="uni">КазНУ</span><span class="uni en">NU</span><span class="uni">КИМЭП</span>
+              </div>
+              <div class="sub" style="margin-top:16px">Зелёным — есть программа на английском.</div>
+            </div>
+            <div class="loc-block" style="margin-top:34px">
+              <div class="cap">Стык локального и международного</div>
+              <div class="loc-rows">
+                <div class="loc-row"><span class="k">конвертация ОРТ / аттестата</span><span class="v">как читают за рубежом</span></div>
+                <div class="loc-row"><span class="k">грант в КР vs отъезд</span><span class="v">тайминг и план Б</span></div>
+                <div class="loc-row"><span class="k">квоты и стипендии</span><span class="v">RU · TR · HU · CN</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="loc-strip rv" style="--i:4">
+          <div><b>20 042</b>студента КР за рубежом</div>
+          <div><b>700</b>квот России на 2024/25</div>
+          <div><b>2 454</b>студента в Китае</div>
+          <div><b>8 811</b>студентов в России</div>
+        </div>
+        <div class="local-callout rv" style="--i:5"><span class="marker"></span><p><b>~1 300 грантовых мест остались пустыми.</b> Это не дефицит мест. Это дефицит информации.</p></div>
+      </div>
+      <footer class="foot">
+        <span class="coords">42.87°N 74.59°E · BISHKEK</span>
+        <span>LOCAL CORRIDOR / NEW</span>
+        <span class="pageno"><b>08</b> / 15</span>
+      </footer>
+    </section>
+
+    <!-- ================= 09 ================= -->
+    <section class="slide light" aria-roledescription="slide" aria-label="9 из 15">
+      <span class="ghost" aria-hidden="true">09</span>
+      <header class="head">
+        <span class="brand">LOGOS<span class="dot">/</span>2026</span>
+        <span>ADMISSIONHACK</span>
+        <span class="sect">09 / РЕШЕНИЕ</span>
+      </header>
+      <div class="body">
+        <p class="eyebrow rv" style="--i:0">четыре пути, одна таблица</p>
+        <h2 class="rv" style="--i:1">Один выбор. <span class="thin">Четыре цены.</span></h2>
+        <div class="cmp rv" style="--i:2">
+          <div class="cell h">Критерий</div>
+          <div class="cell h good">Грант в КР</div>
+          <div class="cell h">Платно в КР</div>
+          <div class="cell h good">Стипендия за рубежом</div>
+          <div class="cell h">Платно за рубежом</div>
+
+          <div class="cell rk">Стоимость</div>
+          <div class="cell v good">≈ 0</div>
+          <div class="cell v">60–200 тыс. сом/год</div>
+          <div class="cell v good">0 + стипендия</div>
+          <div class="cell v warn">$8–40 тыс./год</div>
+
+          <div class="cell rk">Язык</div>
+          <div class="cell v">КЫР / РУС</div>
+          <div class="cell v">КЫР / РУС</div>
+          <div class="cell v">EN / местный</div>
+          <div class="cell v">EN</div>
+
+          <div class="cell rk">Главный риск</div>
+          <div class="cell v">конкурс</div>
+          <div class="cell v">качество</div>
+          <div class="cell v">конкурс + документы</div>
+          <div class="cell v warn">финансирование</div>
+
+          <div class="cell rk">Виза</div>
+          <div class="cell v good">не нужна</div>
+          <div class="cell v good">не нужна</div>
+          <div class="cell v warn">да</div>
+          <div class="cell v warn">да</div>
+
+          <div class="cell rk">Срок решения</div>
+          <div class="cell v">июль</div>
+          <div class="cell v">июль–август</div>
+          <div class="cell v">дек–май</div>
+          <div class="cell v">дек–май</div>
+        </div>
+<div class="cmp-concl rv" style="--i:3">Один и тот же абитуриент может выиграть или потерять <b>год и десятки тысяч долларов</b> — в зависимости от того, что он знал в сентябре.</div>
+        <div class="cmp-note rv" style="--i:4"><span class="marker"></span><span><b>Диапазоны — ориентир для сравнения.</b> В продукте у каждой цифры есть источник и дата проверки. Это и есть разница между советом и данными.</span></div>
+      </div>
+      <footer class="foot">
+        <span class="coords">42.87°N 74.59°E · BISHKEK</span>
+        <span>DECISION TABLE</span>
+        <span class="pageno"><b>09</b> / 15</span>
+      </footer>
+    </section>
+
+    <!-- ================= 10 ================= -->
+    <section class="slide" aria-roledescription="slide" aria-label="10 из 15">
+      <span class="ghost" aria-hidden="true">10</span>
+      <header class="head">
+        <span class="brand">LOGOS<span class="dot">/</span>2026</span>
+        <span>ADMISSIONHACK</span>
+        <span class="sect">10 / IMPACT</span>
+      </header>
+      <div class="body">
+        <p class="eyebrow rv" style="--i:0">теория изменений в четыре шага</p>
+        <h2 class="rv" style="--i:1">Что мы считаем успехом.</h2>
+        <div class="chain rv" style="--i:2">
+          <div class="node"><div class="cap">Ресурс</div><div class="t">Открытая база + структурированный процесс + локальный контур</div></div>
+          <div class="node"><div class="cap">Действие</div><div class="t">Абитуриент проходит чек-лист и видит дедлайны</div></div>
+          <div class="node"><div class="cap">Результат</div><div class="t">Меньше пропущенных шагов и неверных решений</div></div>
+          <div class="node"><div class="cap">Влияние</div><div class="t">Доступ к образованию не зависит от дохода семьи</div></div>
+        </div>
+        <div class="metrics rv" style="--i:3">
+          <div class="metric"><div class="n">1 000</div><div class="d">абитуриентов дошли до шага 03 за 90 дней</div></div>
+          <div class="metric"><div class="n">≥ 25%</div><div class="d">доводят заявку до шага 06</div></div>
+          <div class="metric"><div class="n">10 ч</div><div class="d">сэкономленного времени на пользователя</div></div>
+          <div class="metric"><div class="n">100%</div><div class="d">записей локального модуля проверены вручную</div></div>
+        </div>
+        <div class="measure rv" style="--i:4">
+          <div><div class="k">Откуда цифры</div><p>События шагов в продукте, опрос при возврате, журнал пилотных школ. <b>Без аналитики по кликам.</b></p></div>
+          <div><div class="k">Чего не считаем</div><p>Просмотры и охват. <b>Заявка, доведённая до конца</b>, — единственная метрика, которая значит impact.</p></div>
+        </div>
+        <p class="impact-line rv" style="--i:5">Мы не обещаем поступление. Мы обещаем, что человек <span>не пропустит шаг</span>, о котором не знал.</p>
+      </div>
+      <footer class="foot">
+        <span class="coords">42.87°N 74.59°E · BISHKEK</span>
+        <span>IMPACT / 90 DAYS</span>
+        <span class="pageno"><b>10</b> / 15</span>
+      </footer>
+    </section>
+
+    <!-- ================= 11 ================= -->
+    <section class="slide" aria-roledescription="slide" aria-label="11 из 15">
+      <span class="ghost" aria-hidden="true">11</span>
+      <header class="head">
+        <span class="brand">LOGOS<span class="dot">/</span>2026</span>
+        <span>ADMISSIONHACK</span>
+        <span class="sect">11 / ЗАЩИТА</span>
+      </header>
+      <div class="body">
+        <p class="eyebrow rv" style="--i:0">вопрос, который зададут все</p>
+        <h2 class="rv" style="--i:1">Почему не ChatGPT?</h2>
+        <div class="moat rv" style="--i:2">
+          <div class="row"><div class="n">01</div><div><h4>Процесс и тайминг</h4><p>Модель отвечает на вопрос. Мы ведём по последовательности: что делать, в каком месяце, что ломается, если пропустить.</p></div></div>
+          <div class="row"><div class="n">02</div><div><h4>Провенанс</h4><p>У каждой записи — источник и дата проверки. Модель не покажет, откуда взяла цифру, и не признается, что устарела.</p></div></div>
+          <div class="row"><div class="n">03</div><div><h4>Локальный контур</h4><p>ОРТ, ЕНТ, гранты КР, конвертация аттестата. Этого нет в общих моделях — и это нельзя угадать.</p></div></div>
+          <div class="row"><div class="n">04</div><div><h4>Этика</h4><p>Наша выгода не зависит от того, куда человек поступит. Мы не продаём надежду и не берём комиссию с вузов.</p></div></div>
+        </div>
+        <div class="moat-quote rv" style="--i:3">Модель знает всё. Но не знает, что <em>ваш дедлайн — послезавтра.</em></div>
+        <div class="moat-foot rv" style="--i:4">
+          <div class="a">ChatGPT отвечает на вопрос.</div>
+          <div class="b">Мы доводим до решения.</div>
+        </div>
+      </div>
+      <footer class="foot">
+        <span class="coords">42.87°N 74.59°E · BISHKEK</span>
+        <span>MOAT</span>
+        <span class="pageno"><b>11</b> / 15</span>
+      </footer>
+    </section>
+
+    <!-- ================= 12 ================= -->
+    <section class="slide" aria-roledescription="slide" aria-label="12 из 15">
+      <span class="ghost" aria-hidden="true">12</span>
+      <header class="head">
+        <span class="brand">LOGOS<span class="dot">/</span>2026</span>
+        <span>ADMISSIONHACK</span>
+        <span class="sect">12 / МОДЕЛЬ</span>
+      </header>
+      <div class="body">
+        <p class="eyebrow rv" style="--i:0">устойчивость без продажи доступа</p>
+        <h2 class="rv" style="--i:1">Бесплатно — <em>навсегда.</em></h2>
+        <div class="biz">
+          <div class="free rv" style="--i:2">
+            <div class="cap">Free core / навсегда</div>
+            <div class="big">Процесс, дедлайны и данные</div>
+            <ul>
+              <li><span class="m">→</span>Все восемь шагов</li>
+              <li><span class="m">→</span>Каталог вузов и стипендий</li>
+              <li><span class="m">→</span>Workspace без аккаунта</li>
+              <li><span class="m">→</span>Локальный модуль КР / КЗ</li>
+              <li><span class="m">→</span>Источник и дата у каждой записи</li>
+            </ul>
+          </div>
+          <div class="rv" style="--i:3">
+            <div class="biz-rows">
+              <div class="biz-row"><span class="n">01</span><span class="t">Лицензии для школ<small>Панель прогресса для классного руководителя</small></span><span class="p">B2B</span></div>
+              <div class="biz-row"><span class="n">02</span><span class="t">Гранты фондов<small>Доступ к образованию, Центральная Азия</small></span><span class="p">GRANT</span></div>
+              <div class="biz-row"><span class="n">03</span><span class="t">Платные ревью эссе и документов<small>По желанию; процесс остаётся бесплатным</small></span><span class="p">ADD-ON</span></div>
+              <div class="biz-row"><span class="n">04</span><span class="t">Агрегированная аналитика<small>Для вузов и НКО; только обезличенные данные</small></span><span class="p">DATA</span></div>
+            </div>
+            <p class="biz-note" style="margin-top:28px"><b>Жёсткое правило:</b> платный листинг вуза маркируется и никогда не влияет на выдачу. Если правило нарушится — продукт умрёт. Мы фиксируем его публично.</p>
+          </div>
+        </div>
+        <div class="biz-zero rv" style="--i:4"><span class="n">0₽</span><span class="d">стоимость доступа к процессу для абитуриента — навсегда</span></div>
+      </div>
+      <footer class="foot">
+        <span class="coords">42.87°N 74.59°E · BISHKEK</span>
+        <span>BUSINESS MODEL</span>
+        <span class="pageno"><b>12</b> / 15</span>
+      </footer>
+    </section>
+
+    <!-- ================= 13 ================= -->
+    <section class="slide" aria-roledescription="slide" aria-label="13 из 15">
+      <span class="ghost" aria-hidden="true">13</span>
+      <header class="head">
+        <span class="brand">LOGOS<span class="dot">/</span>2026</span>
+        <span>ADMISSIONHACK</span>
+        <span class="sect">13 / 72 ЧАСА</span>
+      </header>
+      <div class="body">
+        <p class="eyebrow rv" style="--i:0">скоуп заморожен в первый час</p>
+        <h2 class="rv" style="--i:1">Что появится за 72 часа.</h2>
+        <div class="hours rv" style="--i:2">
+          <div class="col must">
+            <div class="cap"><span class="t">Must</span><span class="c">без этого нет результата</span></div>
+            <ul>
+              <li><span class="b">M1</span><span>Локальный модуль КР / КЗ<small>ОРТ и ЕНТ: пороги, сроки, правила</small></span></li>
+              <li><span class="b">M2</span><span>Таблица «грант vs стипендия vs платно»<small>деньги, годы, условия</small></span></li>
+              <li><span class="b">M3</span><span>6–8 вузов КР и КЗ<small>программы на английском, стоимость</small></span></li>
+              <li><span class="b">M4</span><span>Конвертация ОРТ и аттестата<small>как это читают за рубежом</small></span></li>
+              <li><span class="b">M5</span><span>Провенанс<small>источник и дата у каждой записи</small></span></li>
+            </ul>
+          </div>
+          <div class="col should">
+            <div class="cap"><span class="t">Should</span><span class="c">если Must закрыт</span></div>
+            <ul>
+              <li><span class="b">S1</span><span>Полная стоимость за 4 года<small>а не за первый курс</small></span></li>
+              <li><span class="b">S2</span><span>Фильтр «программа на английском»<small>один переключатель</small></span></li>
+              <li><span class="b">S3</span><span>Локальный вуз в workspace рядом с зарубежным</span></li>
+              <li><span class="b">S4</span><span>Блок «что ломается» для ОРТ</span></li>
+            </ul>
+          </div>
+          <div class="col wont">
+            <div class="cap"><span class="t">Won't</span><span class="c">явно не делаем</span></div>
+            <ul>
+              <li><span class="b">—</span><span>AI-советник в демо</span></li>
+              <li><span class="b">—</span><span>Новые страны</span></li>
+              <li><span class="b">—</span><span>Аккаунты и синхронизация</span></li>
+              <li><span class="b">—</span><span>Редизайн главной</span></li>
+            </ul>
+          </div>
+        </div>
+<div class="done rv" style="--i:3"><span class="marker"></span><span><b>Definition of done:</b> демо проходит три раза подряд; у 100 % записей локального модуля есть источник и дата проверки.</span></div>
+        <div class="hours-foot rv" style="--i:4">
+          <span><b>Правило:</b> всё, что не в Must, не делается до воскресенья</span>
+          <span>Заморозка кода → питч → защита</span>
+        </div>
+      </div>
+      <footer class="foot">
+        <span class="coords">42.87°N 74.59°E · BISHKEK</span>
+        <span>SCOPE / 23–25 OCT</span>
+        <span class="pageno"><b>13</b> / 15</span>
+      </footer>
+    </section>
+
+    <!-- ================= 14 ================= -->
+    <section class="slide" aria-roledescription="slide" aria-label="14 из 15">
+      <span class="ghost" aria-hidden="true">14</span>
+      <header class="head">
+        <span class="brand">LOGOS<span class="dot">/</span>2026</span>
+        <span>ADMISSIONHACK</span>
+        <span class="sect">14 / КОМАНДА</span>
+      </header>
+      <div class="body">
+        <p class="eyebrow rv" style="--i:0">четыре роли, один ритм</p>
+        <h2 class="rv" style="--i:1">Кто за что отвечает.</h2>
+        <div class="team rv" style="--i:2">
+          <div class="role"><div class="n">Роль 01</div><h3>Продукт и питч</h3><p>Скоуп, сценарий демо, ответы жюри, тайминг. Держит «Won't» закрытым.</p></div>
+          <div class="role"><div class="n">Роль 02</div><h3>Фронтенд</h3><p>Локальный модуль, вёрстка, доступность, офлайн-копия демо.</p></div>
+          <div class="role"><div class="n">Роль 03</div><h3>Данные</h3><p>ОРТ / ЕНТ, вузы, стипендии, провенанс, ссылки на первоисточники.</p></div>
+          <div class="role"><div class="n">Роль 04</div><h3>Дизайн</h3><p>Слайды, визуальная система, читаемость на проекторе.</p></div>
+        </div>
+        <div class="ritual rv" style="--i:3">
+          <span><b>Утро:</b> что закрыто / что режем</span><span class="bar"></span>
+          <span><b>Вечер:</b> коммит · пуш · сон</span><span class="bar"></span>
+          <span><b>Правило двух минут:</b> не в Must — не делаем</span>
+        </div>
+      </div>
+      <footer class="foot">
+        <span class="coords">42.87°N 74.59°E · BISHKEK</span>
+        <span>TEAM / OPERATING RHYTHM</span>
+        <span class="pageno"><b>14</b> / 15</span>
+      </footer>
+    </section>
+
+    <!-- ================= 15 ================= -->
+    <section class="slide light" aria-roledescription="slide" aria-label="15 из 15">
+      <span class="ghost" aria-hidden="true">15</span>
+      <header class="head">
+        <span class="brand">LOGOS<span class="dot">/</span>2026</span>
+        <span>ADMISSIONHACK</span>
+        <span class="sect">15 / ФИНАЛ</span>
+      </header>
+      <div class="body">
+        <div class="close-wrap">
+          <p class="eyebrow rv" style="--i:0">57 458 абитуриентов в год · 10 000 грантов · 20 042 за рубежом</p>
+          <h2 class="close-h rv" style="--i:1">1 506 университетов.<br>Одно решение.<span class="en">Every university on Earth.<br>One decision.</span></h2>
+          <p class="close-sub rv" style="--i:2">AdmissionHack делает путь в высшее образование публичным, проверяемым и бесплатным — для всех, а не только для тех, у кого есть консультант.</p>
+          <div class="close-foot rv" style="--i:3">
+            <div class="close-ask">
+              <div class="k">Если мы победим</div>
+              <div class="v">Приз → верификация данных и пилот с 50 школами в Кыргызстане. Месяц работы над точностью.</div>
+            </div>
+            <div class="close-url">LOGOS HACKATHON · 2026</div>
+          </div>
+        </div>
+      </div>
+      <footer class="foot">
+        <span class="coords">42.87°N 74.59°E · BISHKEK</span>
+        <span>LOGOS HACKATHON · 23–25.10.2026</span>
+        <span class="pageno"><b>15</b> / 15</span>
+      </footer>
+    </section>
+
+  </div>
+</div>
+
+<nav class="nav" aria-label="Навигация по слайдам">
+  <button type="button" id="prev" aria-label="Предыдущий слайд">←</button>
+  <span class="count" id="count" aria-live="polite">01 / 15</span>
+  <button type="button" id="next" aria-label="Следующий слайд">→</button>
+</nav>
+<div class="hint" aria-hidden="true">← → · Space · F</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var params = new URLSearchParams(location.search);
+  var reduceMQ = window.matchMedia("(prefers-reduced-motion: reduce)");
+  var forceReduce = params.has("reduce");
+  var staticMode = params.has("static");
+
+  var root = document.documentElement;
+  root.classList.remove("no-js");
+  if (forceReduce) root.classList.add("reduce");
+  if (staticMode) root.classList.add("static");
+
+  var stage = document.getElementById("stage");
+  var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+  var countEl = document.getElementById("count");
+  var progress = document.getElementById("progress");
+  var total = slides.length;
+
+  // Prepare reveal order per slide
+  slides.forEach(function(slide){
+    var rv = slide.querySelectorAll(".rv");
+    for (var k = 0; k < rv.length; k++) {
+      if (!rv[k].style.getPropertyValue("--i")) rv[k].style.setProperty("--i", k);
+    }
+  });
+
+  function pad(n){ return (n < 10 ? "0" : "") + n; }
+
+  var index = 0;
+  var fromHash = parseInt((location.hash || "").replace("#", ""), 10);
+  var fromParam = parseInt(params.get("slide"), 10);
+  if (!isNaN(fromParam)) index = fromParam - 1;
+  else if (!isNaN(fromHash)) index = fromHash - 1;
+  if (index < 0) index = 0;
+  if (index > total - 1) index = total - 1;
+
+  function fmtCount(el, n){
+    var prefix = el.getAttribute("data-prefix") || "";
+    var suffix = el.getAttribute("data-suffix") || "";
+    return prefix + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + suffix;
+  }
+  function runCounts(slide){
+    var els = slide.querySelectorAll("[data-count]");
+    for (var j = 0; j < els.length; j++) {
+      (function(el){
+        var target = parseInt(el.getAttribute("data-count"), 10);
+        if (isNaN(target)) return;
+        var still = staticMode || forceReduce || reduceMQ.matches;
+        if (still) { el.textContent = fmtCount(el, target); return; }
+        var t0 = performance.now(), dur = 900;
+        function step(t){
+          var p = Math.min(1, (t - t0) / dur);
+          var e = 1 - Math.pow(1 - p, 3);
+          el.textContent = fmtCount(el, Math.round(target * e));
+          if (p < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+      })(els[j]);
+    }
+  }
+
+  function render(){
+    slides.forEach(function(slide, k){
+      var on = k === index;
+      slide.classList.toggle("is-active", on);
+      slide.setAttribute("aria-hidden", on ? "false" : "true");
+    });
+    countEl.textContent = pad(index + 1) + " / " + total;
+    progress.style.width = ((index + 1) / total * 100) + "%";
+    progress.setAttribute("aria-valuenow", String(index + 1));
+    if (!staticMode) runCounts(slides[index]);
+    if (!staticMode) {
+      try { history.replaceState(null, "", "#" + (index + 1)); } catch(e){}
+    }
+  }
+
+  function go(n){
+    if (n < 0 || n > total - 1) return;
+    index = n;
+    render();
+  }
+
+  function next(){ go(index + 1); }
+  function prev(){ go(index - 1); }
+
+  document.getElementById("next").addEventListener("click", next);
+  document.getElementById("prev").addEventListener("click", prev);
+
+  document.addEventListener("keydown", function(e){
+    var tag = (e.target && e.target.tagName) || "";
+    if (tag === "INPUT" || tag === "TEXTAREA") return;
+    switch (e.key) {
+      case "ArrowRight":
+      case "ArrowDown":
+      case " ":
+      case "PageDown":
+        e.preventDefault(); next(); break;
+      case "ArrowLeft":
+      case "ArrowUp":
+      case "PageUp":
+        e.preventDefault(); prev(); break;
+      case "Home": e.preventDefault(); go(0); break;
+      case "End": e.preventDefault(); go(total - 1); break;
+      case "f":
+      case "F":
+        if (document.fullscreenElement) document.exitFullscreen();
+        else if (root.requestFullscreen) root.requestFullscreen();
+        break;
+    }
+  });
+
+  window.addEventListener("hashchange", function(){
+    var n = parseInt((location.hash || "").replace("#", ""), 10);
+    if (!isNaN(n) && n - 1 !== index) go(n - 1);
+  });
+
+  // Scale the fixed 1920x1080 stage to the viewport
+  function fit(){
+    var s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+    stage.style.setProperty("--scale", String(s));
+  }
+  window.addEventListener("resize", fit);
+  fit();
+
+  // Touch navigation
+  var tx = 0, ty = 0;
+  document.addEventListener("touchstart", function(e){
+    if (!e.touches || !e.touches[0]) return;
+    tx = e.touches[0].clientX; ty = e.touches[0].clientY;
+  }, {passive:true});
+  document.addEventListener("touchend", function(e){
+    if (!e.changedTouches || !e.changedTouches[0]) return;
+    var dx = e.changedTouches[0].clientX - tx;
+    var dy = e.changedTouches[0].clientY - ty;
+    if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy)) {
+      if (dx < 0) next(); else prev();
+    }
+  }, {passive:true});
+
+  // React to OS reduced-motion changes without reload
+  function syncMotion(){
+    var on = reduceMQ.matches || forceReduce;
+    root.classList.toggle("reduce", on);
+  }
+  if (reduceMQ.addEventListener) reduceMQ.addEventListener("change", syncMotion);
+  else if (reduceMQ.addListener) reduceMQ.addListener(syncMotion);
+  syncMotion();
+
+  render();
+})();
+</script>
+</body>
+</html>
